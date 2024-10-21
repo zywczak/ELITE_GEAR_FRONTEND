@@ -1,11 +1,17 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import {BrowserRouter, Route, Routes} from "react-router-dom";
 import './index.css';
+// import App from './App';
 import reportWebVitals from './reportWebVitals';
+import Home from './pages/Home';
 import Register from './pages/Register';
 import Login from './pages/Login';
-import Home from './pages/Home';
+import {BrowserRouter, Route, Routes} from "react-router-dom";
+import Products from './pages/Products';
+import MotherboardPage from './pages/MotherboardPage';
+import CPUPage from './pages/CPUPage';
+import CoolerPage from './pages/CoolerPage';
+import RamPage from './pages/RamPage';
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
@@ -14,9 +20,15 @@ root.render(
   <React.StrictMode>
     <BrowserRouter>
         <Routes>
+          {/* <Route path="/" element={<App />} /> */}
           <Route path="/" element={<Home />} />
           <Route path="/register" element={<Register/>}/>
           <Route path="/login" element={<Login/>}/>
+          <Route path="/:category" element={<Products />} />
+          <Route path="/motherboard/:id" element={<MotherboardPage />} />
+          <Route path="/cpu/:id" element={<CPUPage />} />
+          <Route path="/ram/:id" element={<RamPage />} />
+          <Route path="/coolers/:id" element={<CoolerPage />} />
         </Routes>
     </BrowserRouter>
   </React.StrictMode>

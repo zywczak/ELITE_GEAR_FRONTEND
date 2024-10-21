@@ -1,51 +1,40 @@
 import React, { useEffect } from "react";
 import { createUseStyles } from "react-jss";
-// import LeftWrapper from "../components/auth/LeftWrapper";
-// import RegisterWrapper from "../components/auth/RegisterWrapper";
+import RegisterWrapper from "../components/auth/RegisterWrapper";
+import LeftWrapper from "../components/auth/LeftWrapper";
+import Footer from "../components/footer";
 
 const useStyles = createUseStyles({
-  root: {
-        display: 'flex',
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'center',
-        height: '100vh',
-        width: '100vw',
-        backgroundColor: '#161A30',
+    root: {
+      padding: ' 50px 200px',
+      display: 'flex',
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
+      height: '79vh',
+      '@media (max-width: 1200px)': {
+        padding: '0px',
+        height: '91vh',
       },
-      wrapper:{
-        display: 'flex',
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'center',
-        padding: '20px',
-        width: '80%',
-        height: '100vh',
       },
-      '@media (max-width: 1080px)': {
-        wrapper: {
-          width: '100%',
-          height: '100vh',
-          padding: '0px',
-        },
-      },
-});
+    });
 
-const Registration: React.FC = () => {
+const Register: React.FC = () => {
   const classes = useStyles();
 
   useEffect(() => {
-    document.title = "Utwórz konto";
+    document.title = "Zarejestruj się";
   }, []);
-
+                          
   return (
+    <>
       <div className={classes.root}>
-        <div className={classes.wrapper}>
-        {/* <LeftWrapper />
-        <RegisterWrapper /> */}
-        </div>
+        <LeftWrapper />
+        <RegisterWrapper />
       </div>
+      <Footer />
+    </>
   );
 };
 
-export default Registration;
+export default Register;

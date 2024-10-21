@@ -1,35 +1,24 @@
 import React, { useEffect } from "react";
 import { createUseStyles } from "react-jss";
-// import LeftWrapper from "../components/auth/LeftWrapper";
-// import LoginWrapper from "../components/auth/LoginWrapper";
+import LoginWrapper from "../components/auth/LoginWrapper";
+import LeftWrapper from "../components/auth/LeftWrapper";
+import Footer from "../components/footer";
 
 const useStyles = createUseStyles({
     root: {
-        display: 'flex',
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'center',
-        height: '100vh',
-        width: '100vw',
-        backgroundColor: '#161A30',
+      padding: ' 50px 200px',
+      display: 'flex',
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
+      height: '79vh',
+      '@media (max-width: 1200px)': {
+        padding: '0px',
+        height: '91vh',
       },
-      wrapper:{
-        display: 'flex',
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'center',
-        padding: '20px',
-        width: '80%',
-        height: '100vh',
-      },
-      '@media (max-width: 1080px)': {
-        wrapper: {
-          width: '100%',
-          height: '100vh',
-          padding: '0px',
-        },
       },
     });
+    
 const Login: React.FC = () => {
   const classes = useStyles();
 
@@ -38,12 +27,13 @@ const Login: React.FC = () => {
   }, []);
                           
   return (
-    <div className={classes.root}>
-      <div className={classes.wrapper}>
-        {/* <LeftWrapper />
-        <LoginWrapper /> */}
+    <>
+      <div className={classes.root}>
+        <LeftWrapper />
+        <LoginWrapper />
       </div>
-    </div>
+      <Footer />
+    </>
   );
 };
 
