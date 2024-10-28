@@ -84,7 +84,6 @@ const MotherboardForm = () => {
         manufacturer: '',
         model: '',
         price: 0,
-        rating: 0,
         photos: [] as File[],
         chipset: '',
         formFactor: '',
@@ -130,7 +129,6 @@ const MotherboardForm = () => {
         if (!formData.manufacturer) formErrors.manufacturer = 'Manufacturer is required';
         if (!formData.model) formErrors.model = 'Model is required';
         if (formData.price <= 0) formErrors.price = 'Price must be greater than zero';
-        if (formData.rating < 0 || formData.rating > 5) formErrors.rating = 'Rating must be between 0 and 5';
         if (!formData.chipset) formErrors.chipset = 'Chipset is required';
         if (!formData.formFactor) formErrors.formFactor = 'Form Factor is required';
         if (!formData.supportedMemory) formErrors.supportedMemory = 'Supported Memory is required';
@@ -152,7 +150,6 @@ const MotherboardForm = () => {
         submitData.append('manufacturer', formData.manufacturer);
         submitData.append('model', formData.model);
         submitData.append('price', formData.price.toString());
-        submitData.append('rating', formData.rating.toString());
         submitData.append('chipset', formData.chipset);
         submitData.append('formFactor', formData.formFactor);
         submitData.append('supportedMemory', formData.supportedMemory);
@@ -168,12 +165,13 @@ const MotherboardForm = () => {
         });
 
         try {
-            const response = await axios.post('http://localhost:8080/motherboards', submitData, {
+            const response = await axios.post('http://localhost:8080/motherboard', submitData, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
                 },
             });
             console.log('Motherboard added successfully:', response.data);
+            window.location.reload();
         } catch (error) {
             console.error('Error adding motherboard:', error);
         }
@@ -223,19 +221,6 @@ const MotherboardForm = () => {
                                         className={classes.input}
                                     />
                                     {errors.price && <div className={classes.errorMessage}>{errors.price}</div>}
-                                </td>
-                            </tr>
-                            <tr>
-                                <th className={classes.th}>Rating</th>
-                                <td className={classes.td}>
-                                    <input
-                                        type="number"
-                                        name="rating"
-                                        value={formData.rating}
-                                        onChange={handleChange}
-                                        className={classes.input}
-                                    />
-                                    {errors.rating && <div className={classes.errorMessage}>{errors.rating}</div>}
                                 </td>
                             </tr>
                             <tr>

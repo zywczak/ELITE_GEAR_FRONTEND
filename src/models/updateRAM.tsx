@@ -1,9 +1,7 @@
-export interface RAM{
+export interface UpdateRAM{
     manufacturer: string;
     model: string;
     price: number;
-    rating: number;
-    photos: File[]
     speed: number
     capacity: string
     voltage: number

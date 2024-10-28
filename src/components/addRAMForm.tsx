@@ -84,7 +84,6 @@ const RAMForm = () => {
         manufacturer: '',
         model: '',
         price: 0,
-        rating: 0,
         photos: [] as File[],
         speed: 0,
         capacity: '',
@@ -127,7 +126,6 @@ const RAMForm = () => {
         if (!formData.manufacturer) formErrors.manufacturer = 'Manufacturer is required';
         if (!formData.model) formErrors.model = 'Model is required';
         if (formData.price <= 0) formErrors.price = 'Price must be greater than zero';
-        if (formData.rating < 0 || formData.rating > 5) formErrors.rating = 'Rating must be between 0 and 5';
         if (formData.speed <= 0) formErrors.speed = 'Speed must be greater than zero';
         if (!formData.capacity) formErrors.capacity = 'Capacity is required';
         if (formData.voltage <= 0) formErrors.voltage = 'Voltage must be greater than zero';
@@ -147,7 +145,6 @@ const RAMForm = () => {
         submitData.append('manufacturer', formData.manufacturer);
         submitData.append('model', formData.model);
         submitData.append('price', formData.price.toString());
-        submitData.append('rating', formData.rating.toString());
         submitData.append('speed', formData.speed.toString());
         submitData.append('capacity', formData.capacity);
         submitData.append('voltage', formData.voltage.toString());
@@ -160,12 +157,13 @@ const RAMForm = () => {
         });
 
         try {
-            const response = await axios.post('http://localhost:8080/rams', submitData, {
+            const response = await axios.post('http://localhost:8080/ram', submitData, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
                 },
             });
             console.log('RAM added successfully:', response.data);
+            window.location.reload();
         } catch (error) {
             console.error('Error adding RAM:', error);
         }
@@ -215,19 +213,6 @@ const RAMForm = () => {
                                         className={classes.input}
                                     />
                                     {errors.price && <div className={classes.errorMessage}>{errors.price}</div>}
-                                </td>
-                            </tr>
-                            <tr>
-                                <th className={classes.th}>Rating</th>
-                                <td className={classes.td}>
-                                    <input
-                                        type="number"
-                                        name="rating"
-                                        value={formData.rating}
-                                        onChange={handleChange}
-                                        className={classes.input}
-                                    />
-                                    {errors.rating && <div className={classes.errorMessage}>{errors.rating}</div>}
                                 </td>
                             </tr>
                             <tr>

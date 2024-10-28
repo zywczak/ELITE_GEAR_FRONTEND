@@ -169,23 +169,7 @@ const CPUForm = () => {
             },
         });
         console.log('CPU added successfully:', response.data);
-        
-        // Optionally reset form after submission
-        setFormData({
-            manufacturer: '',
-            model: '',
-            price: 0,
-            photos: [],
-            speed: 0,
-            architecture: '',
-            supportedMemory: '',
-            cooling: false,
-            threads: 0,
-            technologicalProcess: 0,
-            powerConsumption: 0,
-        });
-        setPreviewImages([]);
-        setErrors({});
+        window.location.reload();
     } catch (error) {
         console.error('Error adding CPU:', error);
     }

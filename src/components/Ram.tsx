@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { createUseStyles } from 'react-jss';
 import { RAM } from '../models/RAM';
 import CounterInput from './CounterInput';
+import ImageGallery from './ImageGallery';
+import { useParams } from 'react-router-dom';
 
 const useStyles = createUseStyles({
   container: {
@@ -154,6 +156,61 @@ const useStyles = createUseStyles({
       borderBottom: '1px solid #666',
     },
   },
+  toggleButton: {
+    backgroundColor: '#007bff',
+    color: 'white',
+    border: 'none',
+    cursor: 'pointer',
+    fontSize: '16px',
+  },
+  updateForm: {
+    width: '80%',
+    margin: '0 auto',
+    padding: '20px',
+    backgroundColor: '#535252',
+    borderRadius: '10px',
+    '& table': {
+      width: '100%',
+      '& td': {
+        padding: '8px',
+      },
+      '& input, & select': {
+        width: '100%',
+        padding: '8px',
+        borderRadius: '4px',
+        border: '1px solid #aaa',
+        backgroundColor: '#fff',
+      },
+    },
+  },
+  formContainer: {
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    marginTop: '20px',
+  },
+  fileInput: {
+    marginBottom: '10px',
+  },
+  deleteCheckbox: {
+    marginRight: '10px',
+  },
+  submitButton: {
+    backgroundColor: '#007bff',
+    color: 'white',
+    padding: '10px 20px',
+    border: 'none',
+    cursor: 'pointer',
+    borderRadius: '5px',
+    fontSize: '16px',
+    marginTop: '20px',
+  },
+  previewContainer: {
+    display: 'flex',
+    flexWrap: 'wrap',
+    gap: '10px',
+    marginTop: '10px',
+  },
 });
 
 // Define the props type
@@ -163,7 +220,8 @@ interface RAMComponentProps {
 
 const RAMComponent: React.FC<RAMComponentProps> = ({ ram }) => {
   const classes = useStyles();
-
+  const { id } = useParams<{ id: string }>();
+  
   const hasPhotos = ram.photos && ram.photos.length > 0;
 
   const [mainImage, setMainImage] = useState<string>(
@@ -173,31 +231,149 @@ const RAMComponent: React.FC<RAMComponentProps> = ({ ram }) => {
   const handleThumbnailClick = (photo: string): void => {
     setMainImage(photo);
   };
+  const [isEditingPhotos, setIsEditingPhotos] = useState<boolean>(false);
+  const [photosToAdd, setPhotosToAdd] = useState<File[]>([]);
+  const [photosToRemove, setPhotosToRemove] = useState<number[]>([]);
+  const [previewPhotos, setPreviewPhotos] = useState<string[]>([]);
 
+  // Toggle photo edit mode
+  const togglePhotoEditMode = () => {
+    setIsEditingPhotos((prev) => !prev);
+  };
+
+  // Handle photo addition with preview
+  const handlePhotoAddition = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files) {
+      const filesArray = Array.from(e.target.files);
+      setPhotosToAdd(filesArray);
+      
+      // Generate previews for added photos
+      const previews = filesArray.map((file) => URL.createObjectURL(file));
+      setPreviewPhotos(previews);
+    }
+  };
+
+  // Handle photo removal selection by extracting ID from URL
+  const handlePhotoRemovalSelection = (photoUrl: string) => {
+    const photoId = parseInt(photoUrl.split('/').pop() || '', 10);
+    setPhotosToRemove((prev) =>
+      prev.includes(photoId) ? prev.filter((id) => id !== photoId) : [...prev, photoId]
+    );
+  };
+  const [loading, setLoading] = useState<boolean>(false);
+  const handlePhotoSubmit = async () => {
+    setLoading(true);
+    const formData = new FormData();
+    photosToAdd.forEach((photo) => formData.append('photosToAdd', photo));
+    photosToRemove.forEach((photoId) => formData.append('photoIdsToRemove', String(photoId)));
+  
+    try {
+      const response = await fetch(`http://localhost:8080/product/${id}/photos`, {
+        method: 'POST',
+        body: formData,
+      });
+      
+      if (response.ok) {
+        alert('Photos updated successfully!');
+        window.location.reload();
+      } else {
+        alert('Failed to update photos.');
+      }
+    } catch (error) {
+      console.error('Error updating photos:', error);
+      alert('An error occurred while updating photos.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const [isEditing, setIsEditing] = useState<boolean>(false);
+  const [updatedRam, setUpdatedRam] = useState(ram);
+  
+  const toggleEditMode = () => {
+    setIsEditing((prev) => !prev);
+  };
+  
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const { name, value } = e.target;
+    setUpdatedRam((prev) => ({
+      ...prev,
+      [name]: ['price', 'speed', 'moduleCount', 'voltage'].includes(name)
+        ? Number(value)
+        : name === 'backlight' || name === 'cooling'
+        ? value === 'true'
+        : value,
+    }));
+  };
+  
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+  
+    console.log('Wysyłane dane:', JSON.stringify(updatedRam));
+    try {
+      const response = await fetch(`http://localhost:8080/ram/${id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(updatedRam),
+      });
+  
+      if (response.ok) {
+        alert('RAM data updated successfully!');
+        setIsEditing(false);
+        window.location.reload();
+      } else {
+        const errorMsg = await response.text();
+        console.error('Błąd:', errorMsg);
+        alert('Failed to update RAM data: ' + errorMsg);
+      }
+    } catch (error) {
+      console.error('Error updating RAM data:', error);
+      alert('Wystąpił błąd podczas aktualizacji danych.');
+    }
+  };
   return (
     <>
       <div className={classes.container}>
-        {/* Image and Thumbnails */}
-        <div className={classes.imageGallery}>
-          <img
-            src={mainImage}
-            alt={ram.model}
-            className={classes.mainImage}
+        {!isEditingPhotos ? (
+          <ImageGallery photos={ram.photos} onMainImageChange={() => {}} />
+        ) : (
+          //zrób z tego komponent do dodawania i usuwania zdjec --
+          <div className={classes.formContainer}>
+          <h3>Update Photos</h3>
+          <input
+            type="file"
+            multiple
+            className={classes.fileInput}
+            onChange={handlePhotoAddition}
           />
-          {hasPhotos && (
-            <div className={classes.thumbnailContainer}>
-              {ram.photos.map((photo: string, index: number) => (
-                <img
-                  key={index}
-                  src={photo}
-                  alt={`thumbnail-${index}`}
-                  className={classes.thumbnail}
-                  onClick={() => handleThumbnailClick(photo)}
-                />
-              ))}
+          <h4>Preview of Added Photos:</h4>
+          <div className={classes.previewContainer}>
+            {previewPhotos.map((photo, index) => (
+              <img key={index} src={photo} alt={`preview-${index}`} className={classes.thumbnail} />
+            ))}
+          </div>
+          <h4>Select Photos to Remove:</h4>
+          {ram.photos.map((photoUrl: string, index: number) => (
+            <div key={index}>
+              <input
+                type="checkbox"
+                className={classes.deleteCheckbox}
+                onChange={() => handlePhotoRemovalSelection(photoUrl)}
+              />
+              <img src={photoUrl} alt={`thumbnail-${index}`} className={classes.thumbnail} />
             </div>
-          )}
-        </div>
+          ))}
+          <button onClick={handlePhotoSubmit} className={classes.submitButton}>
+            Submit Changes
+          </button>
+          </div>
+        )}
+
+        <button onClick={togglePhotoEditMode} className={classes.toggleButton}>
+          {isEditingPhotos ? 'Cancel' : 'Edit Photos'}
+        </button>
 
         {/* Product Details */}
         <div className={classes.details}>
@@ -239,34 +415,130 @@ const RAMComponent: React.FC<RAMComponentProps> = ({ ram }) => {
 
       <div className={classes.specification}>
         <h1 className={classes.specificationTitle}>Specyfikacja</h1>
-        <table className={classes.specificationTable}>
-          <tbody>
-            <tr>
-              <td className={classes.rowName}>Speed:</td>
-              <td>{ram.speed} MHz</td>
-            </tr>
-            <tr>
-              <td className={classes.rowName}>Capacity:</td>
-              <td>{ram.capacity}</td>
-            </tr>
-            <tr>
-              <td className={classes.rowName}>Voltage:</td>
-              <td>{ram.voltage} V</td>
-            </tr>
-            <tr>
-              <td className={classes.rowName}>Module Count:</td>
-              <td>{ram.moduleCount}</td>
-            </tr>
-            <tr>
-              <td className={classes.rowName}>Backlight:</td>
-              <td>{ram.backlight ? 'Yes' : 'No'}</td>
-            </tr>
-            <tr>
-              <td className={classes.rowName}>Cooling:</td>
-              <td>{ram.cooling ? 'Yes' : 'No'}</td>
-            </tr>
-          </tbody>
-        </table>
+        {isEditing ? (
+          <form onSubmit={handleSubmit} className={classes.updateForm}>
+            <table>
+              <tbody>
+              <tr>
+                  <td>Manufacturer:</td>
+                  <td><input type="text" name="manufacturer" value={updatedRam.manufacturer} onChange={handleChange} /></td>
+                </tr>
+                <tr>
+                  <td>Model:</td>
+                  <td><input type="text" name="model" value={updatedRam.model} onChange={handleChange} /></td>
+                </tr>
+                <tr>
+                  <td>Price (zł):</td>
+                  <td><input type="number" name="price" value={updatedRam.price} onChange={handleChange} /></td>
+                </tr>
+                <tr>
+                  <td>Speed (MHz):</td>
+                  <td>
+                    <input
+                      type="number"
+                      name="speed"
+                      value={updatedRam.speed}
+                      onChange={handleChange}
+                    />
+                  </td>
+                </tr>
+                <tr>
+                  <td>Capacity:</td>
+                  <td>
+                    <input
+                      type="text"
+                      name="capacity"
+                      value={updatedRam.capacity}
+                      onChange={handleChange}
+                    />
+                  </td>
+                </tr>
+                <tr>
+                  <td>Voltage (V):</td>
+                  <td>
+                    <input
+                      type="number"
+                      step="0.1"
+                      name="voltage"
+                      value={updatedRam.voltage}
+                      onChange={handleChange}
+                    />
+                  </td>
+                </tr>
+                <tr>
+                  <td>Module Count:</td>
+                  <td>
+                    <input
+                      type="number"
+                      name="moduleCount"
+                      value={updatedRam.moduleCount}
+                      onChange={handleChange}
+                    />
+                  </td>
+                </tr>
+                <tr>
+                  <td>Backlight:</td>
+                  <td>
+                    <select
+                      name="backlight"
+                      value={updatedRam.backlight ? 'true' : 'false'}
+                      onChange={handleChange}
+                    >
+                      <option value="true">Yes</option>
+                      <option value="false">No</option>
+                    </select>
+                  </td>
+                </tr>
+                <tr>
+                  <td>Cooling:</td>
+                  <td>
+                    <select
+                      name="cooling"
+                      value={updatedRam.cooling ? 'true' : 'false'}
+                      onChange={handleChange}
+                    >
+                      <option value="true">Yes</option>
+                      <option value="false">No</option>
+                    </select>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+            <button type="submit" className={classes.toggleButton}>Save Changes</button>
+          </form>
+        ) : (
+          <table className={classes.specificationTable}>
+            <tbody>
+              <tr>
+                <td className={classes.rowName}>Speed:</td>
+                <td>{ram.speed} MHz</td>
+              </tr>
+              <tr>
+                <td className={classes.rowName}>Capacity:</td>
+                <td>{ram.capacity}</td>
+              </tr>
+              <tr>
+                <td className={classes.rowName}>Voltage:</td>
+                <td>{ram.voltage} V</td>
+              </tr>
+              <tr>
+                <td className={classes.rowName}>Module Count:</td>
+                <td>{ram.moduleCount}</td>
+              </tr>
+              <tr>
+                <td className={classes.rowName}>Backlight:</td>
+                <td>{ram.backlight ? 'Yes' : 'No'}</td>
+              </tr>
+              <tr>
+                <td className={classes.rowName}>Cooling:</td>
+                <td>{ram.cooling ? 'Yes' : 'No'}</td>
+              </tr>
+            </tbody>
+          </table>
+        )}
+        <button onClick={toggleEditMode} className={classes.toggleButton}>
+          {isEditing ? 'Cancel' : 'Edit'}
+        </button>
       </div>
     </>
   );

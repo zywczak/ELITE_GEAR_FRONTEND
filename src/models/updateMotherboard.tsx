@@ -2,8 +2,6 @@ export interface UpdateMotherboard {
     manufacturer: string;
     model: string;
     price: number;
-    rating: number;
-    photos: File[]
     chipset: string;
     formFactor: string;
     supportedMemory: string;
