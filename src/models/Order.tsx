@@ -1,7 +1,7 @@
 import { OrderItem } from "./OrderItem";
 
 export interface Order{
-    id: number;
+    orderId: number;
     orderDate: string;
     amount: number;
     isPaid: boolean;
