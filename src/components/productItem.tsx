@@ -2,7 +2,9 @@ import React, { useState } from 'react';
 import { Product } from '../models/Product';
 import { createUseStyles } from 'react-jss';
 import Koszyk from './koszyk.png';
-import { Link } from 'react-router-dom';
+import { isLoggedIn } from '../utils/AuthUttils.';
+import { useNavigate } from 'react-router-dom';  // Import useNavigate
+
 
 const useStyles = createUseStyles({
   productItem: {
@@ -86,10 +88,10 @@ const useStyles = createUseStyles({
   }
 });
 
-const ProductItem: React.FC<Product> = ({ manufacturer, model, price, rating, photos }) => {
+const ProductItem: React.FC<Product> = ({ id, manufacturer, model, price, rating, photos }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
-
   const classes = useStyles();
+  const navigate = useNavigate();  // Use useNavigate instead of useHistory
 
   const handlePrevClick = () => {
     setCurrentIndex((prevIndex) => (prevIndex === 0 ? photos.length - 1 : prevIndex - 1));
@@ -99,26 +101,71 @@ const ProductItem: React.FC<Product> = ({ manufacturer, model, price, rating, ph
     setCurrentIndex((prevIndex) => (prevIndex === photos.length - 1 ? 0 : prevIndex + 1));
   };
 
+  const addToCart = async () => {
+    if (!isLoggedIn()) {
+      navigate("/login");  // Navigate to the login page
+      return;
+    }
+
+    const basketDto = {
+      productId: id,
+      manufacturer,
+      model,
+      price,
+      photos,
+      quantity: 1,
+    };
+
+    try {
+      const token = localStorage.getItem('token');
+        console.log(token);
+        // Sprawdź czy token istnieje
+        if (!token) {
+            throw new Error('No token found');
+        }
+
+      const response = await fetch("http://localhost:8080/cart", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(basketDto),
+      });
+
+      if (response.ok) {
+        alert("Product added to cart!");
+      } else {
+        alert("Failed to add product to cart.");
+      }
+    } catch (error) {
+      console.error("Error adding product to cart:", error);
+      alert("An error occurred. Please try again later.");
+    }
+  };
+
   return (
-      <div className={classes.productItem}>
-        <h3 className={classes.productName}>{manufacturer} {model}</h3>
-        <div className={classes.imageGallery}>
-          <button onClick={handlePrevClick} className={classes.galleryButton}>❮</button>
-          <div className={classes.imageContainer}>
-            <img src={photos[currentIndex]} alt={`${manufacturer} ${model}`} className={classes.productImage} />
-          </div>
-          <button onClick={handleNextClick} className={classes.galleryButton}>❯</button>
+    <div className={classes.productItem}>
+      <h3 className={classes.productName}>{manufacturer} {model}</h3>
+      <div className={classes.imageGallery}>
+        <button onClick={handlePrevClick} className={classes.galleryButton}>❮</button>
+        <div className={classes.imageContainer}>
+          <img src={photos[currentIndex]} alt={`${manufacturer} ${model}`} className={classes.productImage} />
         </div>
-        <div className={classes.rating}>
-          {[...Array(5)].map((_, index) => (
-            <span key={index} className={index < Math.round(rating) ? classes.star : classes.emptyStar}>★</span>
-          ))}
-        </div>
-        <div className={classes.priceAndBasket}>
-          <p className={classes.price}>{price.toFixed(2)} zł</p>
-          <div className={classes.basketIcon}><img className={classes.koszyk} src={Koszyk} alt="Koszyk" /></div> {/* Koszyk */}
+        <button onClick={handleNextClick} className={classes.galleryButton}>❯</button>
+      </div>
+      <div className={classes.rating}>
+        {[...Array(5)].map((_, index) => (
+          <span key={index} className={index < Math.round(rating) ? classes.star : classes.emptyStar}>★</span>
+        ))}
+      </div>
+      <div className={classes.priceAndBasket}>
+        <p className={classes.price}>{price.toFixed(2)} zł</p>
+        <div className={classes.basketIcon}>
+          <img className={classes.koszyk} src={Koszyk} alt="Koszyk" onClick={addToCart} />
         </div>
       </div>
+    </div>
   );
 };
 

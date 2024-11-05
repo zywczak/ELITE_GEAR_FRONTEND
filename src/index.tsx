@@ -12,6 +12,10 @@ import MotherboardPage from './pages/MotherboardPage';
 import CPUPage from './pages/CPUPage';
 import CoolerPage from './pages/CoolerPage';
 import RamPage from './pages/RamPage';
+import { isLoggedIn } from './utils/AuthUttils.';
+import LogoutPage from './pages/LogoutPage';
+import CartPage from './pages/CarttPage';
+import OrdersPage from './pages/OrdersPage';
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
@@ -29,6 +33,13 @@ root.render(
           <Route path="/cpu/:id" element={<CPUPage />} />
           <Route path="/ram/:id" element={<RamPage />} />
           <Route path="/coolers/:id" element={<CoolerPage />} />
+          {isLoggedIn() && (
+          <>
+            <Route path="/logout" element={<LogoutPage />} />
+            <Route path="/cart" element={<CartPage />} />
+            <Route path="/order" element={<OrdersPage />} />
+          </>
+        )}
         </Routes>
     </BrowserRouter>
   </React.StrictMode>

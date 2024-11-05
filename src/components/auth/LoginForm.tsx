@@ -1,5 +1,4 @@
-import { useEffect, useState } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useState } from 'react';
 import { createUseStyles } from 'react-jss';
 
 const useAuthStyles = createUseStyles({
@@ -54,31 +53,73 @@ const useAuthStyles = createUseStyles({
       }
     });
 
-interface FormData {
-  email: string;
-  password: string;
-}
+const LoginForm: React.FC = () => {
+  const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [error, setError] = useState<string | null>(null);
 
-function LoginForm() {
+    const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setEmail(e.target.value);
+    };
+
+    const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setPassword(e.target.value);
+    };
+
+    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+    
+        try {
+            const response = await fetch('http://localhost:8080/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ email, password }),
+            });
+    
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.message || 'Unknown error');
+            }
+    
+            const responseData = await response.json(); // Odczytaj dane odpowiedzi
+            const token = responseData.token; // Pobierz token z odpowiedzi
+            localStorage.setItem('token', token); // Zapisz token w localStorage
+            // Redirect to another page or update the state to indicate success
+            setError(null);
+            window.location.href = '/'; // Redirect to home or another appropriate page
+        } catch (err) {
+            setError('Login failed: ' + (err instanceof Error ? err.message : 'An unknown error occurred'));
+        }
+    };
+
   const classes = useAuthStyles();
   return (
     <div className={classes.wrapper}>
-      <form className={classes.form}>
+      <form className={classes.form} onSubmit={handleSubmit}>
         <label htmlFor='email' className={classes.label}>Email</label>
         <input className={classes.input}
           id="email"
           name='email'
-          type='text'
+          type="email"
+          placeholder="example@gmail.com"
+          value={email}
+          onChange={handleEmailChange}
+          required
         />
         <label htmlFor='password' className={classes.label}>Hasło</label>
         <input className={classes.input}
           id="password"
           name='password'
-          type='password'
+          type='password'    
+          placeholder="password"
+          value={password}
+          onChange={handlePasswordChange}
+          required
         />
-        <button className={classes.button} type='submit'>
-          Zaloguj się
-        </button>
+        {error && <p className="error">{error}</p>}
+        <input type="submit" className={classes.button} value="Zaloguj się" />
       </form>
     </div>
   );

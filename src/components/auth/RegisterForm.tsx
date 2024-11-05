@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { createUseStyles } from 'react-jss';
 
 const useAuthStyles = createUseStyles({
@@ -54,21 +54,74 @@ const useAuthStyles = createUseStyles({
       }
     });
 
-interface FormData {
-  email: string;
-  password: string;
-}
-
-function LoginForm() {
+const RegistrationForm: React.FC = () => {
   const classes = useAuthStyles();
+  const [formData, setFormData] = useState({
+    name: '',
+    surname: '',
+    email: '',
+    password: '',
+    confirmedPassword: ''
+  });
+
+  const [error, setError] = useState<string | null>(null);
+    const [success, setSuccess] = useState<string | null>(null);
+    const navigate = useNavigate(); // Initialize the useNavigate hook
+
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setFormData({
+            ...formData,
+            [e.target.name]: e.target.value,
+        });
+    };
+
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+
+        if (formData.password !== formData.confirmedPassword) {
+            setError('Passwords do not match');
+            return;
+        }
+        try {
+            const response = await fetch('http://localhost:8080/register', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    ...formData,
+                    type: 'USER',
+                }),
+            });
+            console.log(formData);
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.message || 'Unknown error');
+            }
+
+            const data = await response.json();
+            setSuccess('Registration successful');
+            setError(null);
+
+            // Redirect to the login page
+            navigate('/login'); // Change the path to your login route
+        } catch (err) {
+            setError('Registration failed: ' + (err instanceof Error ? err.message : 'An unknown error occurred'));
+            setSuccess(null);
+        }
+    };
+
   return (
     <div className={classes.wrapper}>
-      <form className={classes.form}>
+      <form className={classes.form} onSubmit={handleSubmit}>
         <label htmlFor='name' className={classes.label}>Imię</label>
         <input className={classes.input}
           id="name"
           name='name'
           type='text'
+          value={formData.name}
+          onChange={handleChange}
+          required
         />
 
       <label htmlFor='surname' className={classes.label}>Nazwisko</label>
@@ -76,35 +129,47 @@ function LoginForm() {
           id="surname"
           name='surname'
           type='text'
+          value={formData.surname}
+          onChange={handleChange}
+          required
         />
 
         <label htmlFor='email' className={classes.label}>Email</label>
         <input className={classes.input}
           id="email"
           name='email'
-          type='text'
+          type='email'
+          value={formData.email}
+          onChange={handleChange}
+          required
         />
-
         <label htmlFor='password' className={classes.label}>Hasło</label>
         <input className={classes.input}
           id="password"
           name='password'
           type='password'
+          value={formData.password}
+          onChange={handleChange}
+          required
         />
 
-        <label htmlFor='confirmPassword' className={classes.label}>Powtórz hasło</label>
+        <label htmlFor='confirmedPassword' className={classes.label}>Powtórz hasło</label>
         <input className={classes.input}
-          id="confirmPassword"
-          name='confirmPassword'
+          id="confirmedPassword"
+          name='confirmedPassword'
           type='password'
+          value={formData.confirmedPassword}
+          onChange={handleChange}
+          required
         />
-
+        {error && <p className="error">{error}</p>}
+        {success && <p className="success">{success}</p>}
         <button className={classes.button} type='submit'>
-          Zaloguj się
+          Zarejestruj
         </button>
       </form>
     </div>
   );
 }
 
-export default LoginForm;
+export default RegistrationForm;
