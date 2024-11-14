@@ -6,6 +6,7 @@ import Nav from "../components/nav";
 import { useParams } from 'react-router-dom';
 import CPUComponent from '../components/Cpu';
 import CPUForm from '../components/addCPUForm';
+import Comments from '../components/comments';
 
 const CpuPage = () => { // Rename the function to start with an uppercase letter
   const [cpu, setCpu] = useState<any | null>(null); // Consistent casing
@@ -46,6 +47,7 @@ const CpuPage = () => { // Rename the function to start with an uppercase letter
       <Header />
       <Nav />
       <CPUComponent cpu={cpu} />
+      <Comments/>
       <Footer />
     </>
   );
