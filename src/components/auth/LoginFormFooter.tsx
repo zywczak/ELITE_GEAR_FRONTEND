@@ -17,6 +17,7 @@ const LoginFormFooter = () => {
     const classes = useStyles();
 return (
     <div className={classes.formFooter}>
+        <a className={classes.a} href="/forgot-password">Zapomniałem hasła</a><br/>
         Nie masz konta? <a className={classes.a} href="/register">Zarejestruj się</a>
     </div>
 )

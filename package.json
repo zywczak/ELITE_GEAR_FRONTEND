@@ -12,6 +12,7 @@
     "@types/react-dom": "^18.3.0",
     "axios": "^1.7.3",
     "jwt-decode": "^4.0.0",
+    "maildev": "^2.1.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-jss": "^10.10.0",

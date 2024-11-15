@@ -16,6 +16,8 @@ import { isLoggedIn } from './utils/AuthUttils.';
 import LogoutPage from './pages/LogoutPage';
 import CartPage from './pages/CarttPage';
 import OrdersPage from './pages/OrdersPage';
+import ForgotPasswordRequest from './pages/ForgotPasswordRequest';
+import ChangePassword from './pages/ChangePassword';
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
@@ -33,6 +35,8 @@ root.render(
           <Route path="/cpu/:id" element={<CPUPage />} />
           <Route path="/ram/:id" element={<RamPage />} />
           <Route path="/coolers/:id" element={<CoolerPage />} />
+          <Route path="/forgot-password" element={<ForgotPasswordRequest />} />
+          <Route path="/change-password" element={<ChangePassword />} />
           {isLoggedIn() && (
           <>
             <Route path="/logout" element={<LogoutPage />} />
