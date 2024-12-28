@@ -15,6 +15,7 @@ const OrdersPage: React.FC = () => {
             try {
                 const response = await api.get<Order[]>('/orders');
                 setOrders(response.data);
+                setLoading(false);
             } catch (err) {
                 setLoading(false);
             }

@@ -49,9 +49,9 @@ const CartTable: React.FC<CartTableProps> = ({
     <table className={classes.table}>
       <thead>
         <tr>
+          <th className={classes.th}>Photo</th>
           <th className={classes.th}>Manufacturer</th>
           <th className={classes.th}>Model</th>
-          <th className={classes.th}>Photo</th>
           <th className={classes.th}>Quantity</th>
           <th className={classes.th}>Price</th>
           <th className={classes.th}>
