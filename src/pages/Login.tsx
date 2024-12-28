@@ -1,20 +1,19 @@
 import React, { useEffect } from "react";
 import { createUseStyles } from "react-jss";
-import LoginWrapper from "../components/auth/LoginWrapper";
 import LeftWrapper from "../components/auth/LeftWrapper";
-import Footer from "../components/footer";
+import LoginWrapper from "../components/auth/login/LoginWrapper";
 
 const useStyles = createUseStyles({
     root: {
-      padding: ' 50px 200px',
+      padding: '0px 200px',
       display: 'flex',
       flexDirection: 'row',
       alignItems: 'center',
       justifyContent: 'center',
-      height: '79vh',
+      height: '100vh',
       '@media (max-width: 1200px)': {
         padding: '0px',
-        height: '91vh',
+        height: '100vh',
       },
       },
     });
@@ -32,7 +31,6 @@ const Login: React.FC = () => {
         <LeftWrapper />
         <LoginWrapper />
       </div>
-      <Footer />
     </>
   );
 };

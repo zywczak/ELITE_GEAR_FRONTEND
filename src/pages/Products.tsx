@@ -4,12 +4,16 @@ import { createUseStyles } from 'react-jss';
 import Footer from '../components/footer';
 import Header from '../components/header';
 import Nav from '../components/nav';
-import ProductItem from '../components/productItem';
+import ProductItem from '../components/product/productItem';
 import { Product } from '../models/Product';
-import CPUForm from '../components/addCPUForm';
-import CoolerForm from '../components/addCoolerForm';
-import RAMForm from '../components/addRAMForm';
-import MotherboardForm from '../components/addMotherboardForm';
+import CPUForm from '../components/cpu/addCPUForm';
+import CoolerForm from '../components/cooler/addCoolerForm';
+import RAMForm from '../components/ram/addRAMForm';
+import MotherboardForm from '../components/motherboard/addMotherboardForm';
+import api from '../api/axiosApi';
+import axios from 'axios';
+import { isAdmin } from '../utils/AuthUttils.';
+import { ToastContainer } from 'react-toastify';
 
 const useStyles = createUseStyles({
   productList: {
@@ -48,49 +52,46 @@ const useStyles = createUseStyles({
 });
 
 const Products: React.FC = () => {
-  const { category } = useParams<{ category: string }>(); // Get category from URL params
-  const [products, setProducts] = useState<Product[]>([]); // State for storing fetched products
-  const [loading, setLoading] = useState<boolean>(true); // State for loading status
-  const [error, setError] = useState<string | null>(null); // State for error message
-  const [showForm, setShowForm] = useState<boolean>(false); // State to toggle form visibility
+  const { category } = useParams<{ category: string }>(); 
+  const [products, setProducts] = useState<Product[]>([]); 
+  const [loading, setLoading] = useState<boolean>(true); 
+  const [error, setError] = useState<string | null>(null);
+  const [showForm, setShowForm] = useState<boolean>(false);
   const classes = useStyles();
 
   useEffect(() => {
-    // Set the document title based on the category
     document.title = `Produkty - ${category}`;
 
-    // Function to fetch data from the backend based on the category
     const fetchProducts = async () => {
-      setLoading(true); // Set loading to true before fetching
-      setError(null); // Reset error state
+      setLoading(true);
+      setError(null);
 
       try {
-        const response = await fetch(`http://localhost:8080/${category}`); // Backend endpoint
+        const response = await api.get(`/${category}`);
+        setProducts(response.data);
+      } catch (err) {
+        if (axios.isAxiosError(err) && err.response) {
 
-        if (!response.ok) {
-          throw new Error('Network response was not ok');
+            const backendError = err.response.data?.error || 
+                                  err.response.data?.message;
+            setError(backendError);
+        } else {
+            setError('An unexpected error occurred.');
         }
-
-        const data = await response.json(); // Parse the response as JSON
-        setProducts(data); // Set the fetched products to state
-      } catch (error: any) {
-        setError(error.message || 'Error fetching products'); // Set error message
-      } finally {
-        setLoading(false); // Set loading to false after fetching
+    } finally {
+        setLoading(false);
       }
     };
 
     if (category) {
-      fetchProducts(); // Call fetch only if category exists
+      fetchProducts();
     }
   }, [category]);
 
-  // Function to toggle the form visibility
   const handleToggleForm = () => {
     setShowForm((prevShowForm) => !prevShowForm);
   };
 
-  // Function to render the appropriate form based on the category
   const renderForm = () => {
     switch (category) {
       case 'cpu':
@@ -110,15 +111,13 @@ const Products: React.FC = () => {
     <>
       <Header />
       <Nav />
-      {/* Add Product Button */}
+       {isAdmin() && (
       <button className={classes.addButton} onClick={handleToggleForm}>
         {showForm ? 'Zamknij formularz' : 'Dodaj produkt'}
       </button>
-
-      {/* Show Form if toggled */}
+       )}
       {showForm && <div className={classes.formContainer}>{renderForm()}</div>}
 
-      {/* Product List and Error Handling */}
       {loading && <p>Ładowanie...</p>}
       {error && <p className={classes.error}>{error}</p>}
       {products.length > 0 ? (
@@ -139,6 +138,7 @@ const Products: React.FC = () => {
         !loading && <p>Brak produktów w tej kategorii.</p>
       )}
       <Footer />
+      <ToastContainer />
     </>
   );
 };

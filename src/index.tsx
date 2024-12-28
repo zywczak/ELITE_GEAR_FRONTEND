@@ -14,10 +14,11 @@ import CoolerPage from './pages/CoolerPage';
 import RamPage from './pages/RamPage';
 import { isLoggedIn } from './utils/AuthUttils.';
 import LogoutPage from './pages/LogoutPage';
-import CartPage from './pages/CarttPage';
+import CartPage from './pages/CartPage';
 import OrdersPage from './pages/OrdersPage';
 import ForgotPasswordRequest from './pages/ForgotPasswordRequest';
-import ChangePassword from './pages/ChangePassword';
+import ChangePassword from './pages/ChangePasswordPage';
+import ConfirmPage from './pages/ConfirmPage';
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
@@ -37,6 +38,7 @@ root.render(
           <Route path="/coolers/:id" element={<CoolerPage />} />
           <Route path="/forgot-password" element={<ForgotPasswordRequest />} />
           <Route path="/change-password" element={<ChangePassword />} />
+          <Route path="/confirm/:orderId" element={<ConfirmPage />} />
           {isLoggedIn() && (
           <>
             <Route path="/logout" element={<LogoutPage />} />

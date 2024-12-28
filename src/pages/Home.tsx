@@ -7,12 +7,17 @@ import Wallpaper1 from './aside.jpg';
 import Wallpaper2 from './wallpaper.png';
 
 const useStyles = createUseStyles({
-  root: {
+  app: {
     display: 'flex',
-    flexDirection: 'row',
+    flexDirection: 'column',
+    minHeight: '100vh',
+  },
+  content: {
+    flex: 1,
+    display: 'flex',
+    flexDirection: 'column',
     alignItems: 'center',
     justifyContent: 'center',
-    margin: '50px 20px 20px 20px',
   },
   wrapper: {
     display: 'flex',
@@ -20,7 +25,7 @@ const useStyles = createUseStyles({
     alignItems: 'center',
     justifyContent: 'center',
     padding: '20px 0 0 20px',
-    gap: '20px', // Dodaje odstęp pomiędzy tekstem a obrazem
+    gap: '20px',
   },
   slogan: {
     color: 'white',
@@ -30,40 +35,40 @@ const useStyles = createUseStyles({
     margin: 'auto',
   },
   Wallpaper: {
-    maxHeight: '600px',  // Maksymalna wysokość obrazu
-    width: '100%',       // Domyślnie obraz wypełnia dostępne miejsce
-    height: 'auto',      // Zachowanie proporcji przy zmianie szerokości
-    objectFit: 'contain' // Upewnienie się, że obraz będzie wypełniał miejsce bez rozciągania
+    maxHeight: '600px',
+    width: '100%',
+    height: 'auto',
+    objectFit: 'contain',
   },
   '@media (max-width: 1280px)': {
     Wallpaper: {
-      maxHeight: '560px', // Zmniejszenie maksymalnej wysokości przy mniejszych rozdzielczościach
-      width: 'auto',      // Usuwamy width: 100%, żeby obraz nie wypełniał całej szerokości
-      maxWidth: '80%',    // Ustawiamy konkretną szerokość, np. 80% lub inny procent/px
+      maxHeight: '560px',
+      width: 'auto',
+      maxWidth: '80%',
     },
     slogan: {
-      padding: '50px', // Dopasowanie paddingu dla mniejszych ekranów
+      padding: '50px',
     },
   },
   '@media (max-width: 960px)': {
     Wallpaper: {
-      width: 'auto',      // Dodatkowo usuwamy width: 100% dla rozdzielczości 960px
-      maxWidth: '70%',    // Możemy również ustawić inną maksymalną szerokość w tym przedziale
+      width: 'auto',
+      maxWidth: '70%',
     },
     slogan: {
-      fontSize: '28px', // Zmniejszenie czcionki na mniejszych ekranach
+      fontSize: '28px',
     },
   },
   '@media (max-width: 840px)': {
     wrapper: {
-      flexDirection: 'column', // Ustawienie w kolumnie dla mniejszych ekranów
+      flexDirection: 'column',
       padding: '0px',
     },
     Wallpaper: {
-      maxWidth: '500px', // Obraz zajmuje całą szerokość w węższych widokach
+      maxWidth: '500px',
     },
     slogan: {
-      fontSize: '22px', // Zmniejszenie czcionki na mniejszych ekranach
+      fontSize: '22px',
     },
   },
 });
@@ -75,7 +80,6 @@ const Home: React.FC = () => {
   useEffect(() => {
     document.title = "Home";
 
-    // Funkcja do aktualizacji obrazka w zależności od szerokości okna
     const handleResize = () => {
       if (window.innerWidth <= 1280) {
         setCurrentWallpaper(Wallpaper1);
@@ -84,32 +88,31 @@ const Home: React.FC = () => {
       }
     };
 
-    // Wywołanie funkcji przy zmianie rozmiaru okna
     window.addEventListener("resize", handleResize);
 
-    // Sprawdzenie przy załadowaniu strony
     handleResize();
 
-    // Czyszczenie event listenera przy odmontowaniu komponentu
     return () => {
       window.removeEventListener("resize", handleResize);
     };
   }, []);
 
   return (
-    <>
+    <div className={classes.app}>
       <Header />
       <Nav />
-      <div className={classes.wrapper}>
-        <pre className={classes.slogan}>
-          "ELITE_GEAR<br />
-          -<br />
-          KEY TO PERFORMANCE!"
-        </pre>
-        <img className={classes.Wallpaper} src={currentWallpaper} alt="wallpaper" />
+      <div className={classes.content}>
+        <div className={classes.wrapper}>
+          <pre className={classes.slogan}>
+            "ELITE_GEAR<br />
+            -<br />
+            KEY TO PERFORMANCE!"
+          </pre>
+          <img className={classes.Wallpaper} src={currentWallpaper} alt="wallpaper" />
+        </div>
       </div>
       <Footer />
-    </>
+    </div>
   );
 };
 

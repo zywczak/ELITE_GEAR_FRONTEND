@@ -1,28 +1,27 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import { useState, useEffect } from 'react';
 import Footer from "../components/footer";
 import Header from "../components/header";
 import Nav from "../components/nav";
 import { useParams } from 'react-router-dom';
-import CPUComponent from '../components/Cpu';
-import CPUForm from '../components/addCPUForm';
-import Comments from '../components/comments';
+import CPUComponent from '../components/cpu/Cpu';
+import Comments from '../components/comment/comments';
+import { CPU } from '../models/CPU';
+import { ToastContainer } from 'react-toastify';
+import api from '../api/axiosApi';
 
-const CpuPage = () => { // Rename the function to start with an uppercase letter
-  const [cpu, setCpu] = useState<any | null>(null); // Consistent casing
+const CpuPage = () => {
+  const [cpu, setCpu] = useState<CPU | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
 
   const { id } = useParams<{ id: string }>();
 
   useEffect(() => {
-    const fetchCpu = async () => { // Consistent casing
+    const fetchCpu = async () => {
       try {
-        const response = await axios.get(`http://localhost:8080/cpu/${id}`);
-        setCpu(response.data); // Consistent casing
+        const response = await api.get(`/cpu/${id}`);
+        setCpu(response.data); 
         setLoading(false);
       } catch (err) {
-        setError('Failed to fetch CPU data.'); // Consistent casing
         setLoading(false);
       }
     };
@@ -34,12 +33,8 @@ const CpuPage = () => { // Rename the function to start with an uppercase letter
     return <div>Loading...</div>;
   }
 
-  if (error) {
-    return <div>Error: {error}</div>;
-  }
-
   if (!cpu) {
-    return <div>No CPU data available.</div>; // Consistent casing
+    return <div>No CPU data available.</div>; 
   }
 
   return (
@@ -47,10 +42,11 @@ const CpuPage = () => { // Rename the function to start with an uppercase letter
       <Header />
       <Nav />
       <CPUComponent cpu={cpu} />
-      <Comments/>
+      <Comments />
       <Footer />
+      <ToastContainer />
     </>
   );
 };
 
-export default CpuPage; // Ensure the export matches the renamed function
+export default CpuPage;

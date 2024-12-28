@@ -10,9 +10,9 @@ import { CustomJwtPayload } from '../entities/CustoJwtPayload';
 const useStyles = createUseStyles({
     headerContainer: {
         display: 'flex',
-        justifyContent: 'space-between', // Rozmieszcza elementy po lewej i prawej stronie
+        justifyContent: 'space-between',
         alignItems: 'center',
-        padding: '0 20px', // Dodaje odstęp po bokach
+        padding: '0 20px',
     },
     logoContainer: {
         display: 'flex',
@@ -75,9 +75,6 @@ const Header: React.FC = () => {
             </div>
             
             <div className={classes.userInfoContainer}>
-                {/* {isLoggedIn() && (
-                    <img src="/img/user.png" alt="user" className={classes.icon}/>
-                )} */}
                 {isLoggedIn() && userInfo && (
                     <span id="logged_user">
                         {userInfo.name} {userInfo.surname}

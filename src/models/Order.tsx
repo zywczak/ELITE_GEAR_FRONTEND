@@ -4,6 +4,6 @@ export interface Order{
     orderId: number;
     orderDate: string;
     amount: number;
-    isPaid: boolean;
+    paid: boolean;
     products: OrderItem[];
 }

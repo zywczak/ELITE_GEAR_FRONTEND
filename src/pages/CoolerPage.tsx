@@ -1,40 +1,36 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import { useState, useEffect } from 'react';
 import Footer from "../components/footer";
 import Header from "../components/header";
-import CoolerComponent from "../components/Cooler";
+import CoolerComponent from "../components/cooler/Cooler";
 import Nav from "../components/nav";
 import { useParams } from 'react-router-dom';
+import { Cooler } from '../models/Cooler';
+import { ToastContainer } from 'react-toastify';
+import Comments from '../components/comment/comments';
+import api from '../api/axiosApi';
 
 const CoolerPage = () => {
-  const [cooler, setCooler] = useState<any | null>(null);
+  const [cooler, setCooler] = useState<Cooler | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
 
-  const { id } = useParams<{ id: string }>(); // Fetch ID from URL params
+  const { id } = useParams<{ id: string }>();
 
   useEffect(() => {
-    // Fetch Cooler data from the backend API
     const fetchCooler = async () => {
       try {
-        const response = await axios.get(`http://localhost:8080/coolers/${id}`);
-        setCooler(response.data); // Store fetched data
+        const response = await api.get(`/coolers/${id}`);
+        setCooler(response.data);
         setLoading(false);
       } catch (err) {
-        setError('Failed to fetch cooler data.');
         setLoading(false);
       }
     };
 
     fetchCooler();
-  }, [id]); // Re-fetch data if the ID changes
+  }, [id]);
 
   if (loading) {
     return <div>Loading...</div>;
-  }
-
-  if (error) {
-    return <div>Error: {error}</div>;
   }
 
   if (!cooler) {
@@ -46,7 +42,9 @@ const CoolerPage = () => {
       <Header />
       <Nav />
       <CoolerComponent cooler={cooler} />
+      <Comments />
       <Footer />
+      <ToastContainer />
     </>
   );
 };
