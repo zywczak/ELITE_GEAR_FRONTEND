@@ -2,6 +2,8 @@
 
 Implementation of an e-commerce application for selling computer components (frontend part). It provides functionalities such as browsing product listings, creating a shopping cart accessible from any device after logging in, placing orders, making payments, and more.
 
+backend part --> (https://github.com/zywczak/ELITE_GEAR_BACKEND)
+
 ## Technologies
 - React.js
 - Axios
